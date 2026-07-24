@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Events</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf6f0;
+    --warm: #f0e8d8;
+    --terracotta: #c4714a;
+    --rust: #9e4a2a;
+    --forest: #3a5a40;
+    --gold: #c9a84c;
+    --ink: #1a1208;
+    --muted: #8a7a6a;
+    --card-bg: #fffdf9;
+    --shadow: 0 4px 24px rgba(26,18,8,0.10);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* Decorative background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 10% 20%, rgba(196,113,74,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 90% 80%, rgba(58,90,64,0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  header {
+    text-align: center;
+    padding: 56px 24px 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header-ornament {
+    font-size: 28px;
+    margin-bottom: 8px;
+    letter-spacing: 0.3em;
+    opacity: 0.5;
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+
+  header p {
+    margin-top: 10px;
+    color: var(--muted);
+    font-weight: 300;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 300px;
+    margin: 20px auto 0;
+    color: var(--gold);
+    font-size: 18px;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  /* Live date display */
+  .live-date {
+    text-align: center;
+    margin: 0 24px 8px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Main layout */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Add member form */
+  .form-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 18px;
+    padding: 32px 36px;
+    box-shadow: var(--shadow);
+    margin-bottom: 40px;
+  }
+
+  .form-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--rust);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+
+  input, select {
+    background: var(--warm);
+    border: 1.5px solid transparent;
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--terracotta);
+    box-shadow: 0 0 0 3px rgba(196,113,74,0.12);
+    background: #fff;
+  }
+
+  .btn-add {
+    background: linear-gradient(135deg, var(--terracotta), var(--rust));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 30px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 3px 12px rgba(158,74,42,0.3);
+  }
+
+  .btn-add:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 18px rgba(158,74,42,0.4);
+  }
+
+  .btn-add:active { transform: translateY(0); }
+
+  /* Filters */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .toolbar h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    flex: 1;
+  }
+
+  .filter-btn {
+    background: var(--card-bg);
+    border: 1.5px solid rgba(201,168,76,0.3);
+    border-radius: 8px;
+    padding: 7px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .filter-btn.active, .filter-btn:hover {
+    background: var(--terracotta);
+    border-color: var(--terracotta);
+    color: white;
+  }
+
+  /* Cards */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .member-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(201,168,76,0.15);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .member-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .member-card.relation-parent::before { background: linear-gradient(90deg, var(--forest), #6a9a72); }
+  .member-card.relation-spouse::before { background: linear-gradient(90deg, var(--terracotta), var(--gold)); }
+  .member-card.relation-child::before { background: linear-gradient(90deg, #6a8fc4, #4a6fa8); }
+  .member-card.relation-sibling::before { background: linear-gradient(90deg, #a06ab4, #7a4a94); }
+  .member-card.relation-other::before { background: linear-gradient(90deg, var(--muted), var(--ink)); }
+  .member-card.relation-me::before { background: linear-gradient(90deg, var(--gold), #e8c050); }
+
+  .member-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(26,18,8,0.14);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .relation-parent .avatar { background: rgba(58,90,64,0.15); color: var(--forest); }
+  .relation-spouse .avatar { background: rgba(196,113,74,0.15); color: var(--rust); }
+  .relation-child .avatar { background: rgba(106,143,196,0.15); color: #4a6fa8; }
+  .relation-sibling .avatar { background: rgba(160,106,180,0.15); color: #7a4a94; }
+  .relation-other .avatar { background: rgba(138,122,106,0.15); color: var(--muted); }
+  .relation-me .avatar { background: rgba(201,168,76,0.18); color: #8a6a10; }
+
+  .card-name h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .relation-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-top: 4px;
+    text-transform: capitalize;
+    letter-spacing: 0.04em;
+  }
+
+  .relation-parent .relation-badge { background: rgba(58,90,64,0.12); color: var(--forest); }
+  .relation-spouse .relation-badge { background: rgba(196,113,74,0.12); color: var(--rust); }
+  .relation-child .relation-badge { background: rgba(74,111,168,0.12); color: #4a6fa8; }
+  .relation-sibling .relation-badge { background: rgba(122,74,148,0.12); color: #7a4a94; }
+  .relation-other .relation-badge { background: rgba(138,122,106,0.12); color: var(--muted); }
+  .relation-me .relation-badge { background: rgba(201,168,76,0.18); color: #8a6a10; }
+
+  .card-delete {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 4px;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+    line-height: 1;
+  }
+  .card-delete:hover { color: #c0392b; background: rgba(192,57,43,0.08); }
+
+  /* Date rows */
+  .date-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: var(--warm);
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+
+  .date-row:last-child { margin-bottom: 0; }
+
+  .date-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .date-label span { font-size: 1em; }
+
+  .date-info {
+    text-align: right;
+  }
+
+  .date-value {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .countdown {
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+
+  .countdown.soon { color: var(--terracotta); font-weight: 700; }
+  .countdown.today { color: var(--rust); font-weight: 700; animation: pulse 1s infinite; }
+  .countdown.normal { color: var(--forest); }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .age-tag {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Shared anniversary styles */
+  .shared-anniversary {
+    background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(196,113,74,0.08));
+    border: 1px solid rgba(201,168,76,0.3);
+  }
+
+  .shared-tag {
+    display: inline-block;
+    font-size: 0.68rem;
+    background: rgba(201,168,76,0.2);
+    color: #7a5a10;
+    padding: 1px 7px;
+    border-radius: 20px;
+    font-weight: 500;
+    margin-left: 4px;
+    vertical-align: middle;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .shared-ref {
+    background: rgba(201,168,76,0.06);
+    border: 1px dashed rgba(201,168,76,0.3);
+  }
+
+  .shared-ref-text {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* Upcoming section */
+  .upcoming-banner {
+    background: linear-gradient(135deg, #fffbf0, #fff5e6);
+    border: 1.5px solid rgba(201,168,76,0.3);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 32px;
+  }
+
+  .upcoming-banner h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--rust);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .upcoming-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .upcoming-item {
+    background: white;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 0.83rem;
+    box-shadow: 0 2px 8px rgba(26,18,8,0.06);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .upcoming-item strong { color: var(--rust); }
+  .upcoming-item .days-badge {
+    background: var(--terracotta);
+    color: white;
+    border-radius: 20px;
+    padding: 1px 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+
+  .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+  .empty-state p { font-size: 1rem; font-style: italic; }
+
+  /* Stats bar */
+  .stats-bar {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+
+  .stat-pill {
+    background: var(--card-bg);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 50px;
+    padding: 8px 18px;
+    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 6px rgba(26,18,8,0.06);
+  }
+
+  .stat-pill strong { color: var(--terracotta); font-size: 1rem; }
+
+  /* Edit & Delete action buttons */
+  .card-actions {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  .card-edit {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.95rem;
+    padding: 4px 6px;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+    line-height: 1;
+  }
+  .card-edit:hover { color: var(--forest); background: rgba(58,90,64,0.1); }
+
+  /* Edit Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26,18,8,0.45);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 36px 32px 28px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 20px 60px rgba(26,18,8,0.2);
+    animation: modalIn 0.25s ease;
+    position: relative;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.94) translateY(16px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--rust);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .modal .form-grid { margin-bottom: 24px; }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+
+  .btn-cancel {
+    background: var(--warm);
+    color: var(--muted);
+    border: none;
+    border-radius: 10px;
+    padding: 11px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-cancel:hover { background: #e4d8c8; }
+
+  .btn-save {
+    background: linear-gradient(135deg, var(--forest), #2e4a34);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 11px 26px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 3px 12px rgba(58,90,64,0.3);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn-save:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(58,90,64,0.4); }
+
+  @media (max-width: 600px) {
+    .form-card { padding: 20px 18px; }
+    .cards-grid { grid-template-columns: 1fr; }
+    header { padding: 36px 16px 24px; }
+    .modal { padding: 28px 20px 22px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-ornament">❧ ❧ ❧</div>
+  <h1>Family Events</h1>
+  <p>Birthdays · Anniversaries · Milestones</p>
+  <div class="divider">✦</div>
+</header>
+
+<div class="container">
+
+  <div class="live-date" id="liveDate"></div>
+
+  <!-- Add Member Form -->
+  <div class="form-card">
+    <h2>✦ Add Event</h2>
+    <div class="form-grid">
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="name" placeholder="e.g. Priya Sharma">
+      </div>
+      <div class="field">
+        <label>Relation</label>
+        <input type="text" id="relation" placeholder="e.g. Father, Wife, Son…">
+      </div>
+      <div class="field">
+        <label>Date of Birth</label>
+        <input type="date" id="dob">
+      </div>
+      <div class="field">
+        <label>Marriage Date <span style="opacity:0.5">(optional)</span></label>
+        <input type="date" id="marriage">
+      </div>
+    </div>
+    <button class="btn-add" onclick="addMember()">＋ Add Event</button>
+  </div>
+
+  <!-- Upcoming section -->
+  <div class="upcoming-banner" id="upcomingSection" style="display:none">
+    <h3>🎊 Coming Up in the Next 30 Days</h3>
+    <div class="upcoming-list" id="upcomingList"></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-bar" id="statsBar" style="display:none">
+    <div class="stat-pill">👥 <strong id="statTotal">0</strong> members</div>
+    <div class="stat-pill">🎂 <strong id="statBirthdays">0</strong> birthdays</div>
+    <div class="stat-pill">💍 <strong id="statMarriages">0</strong> anniversaries</div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <h2 style="font-family:'Playfair Display',serif">Events</h2>
+    <div id="filterBtns" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"></div>
+  </div>
+
+  <!-- Cards -->
+  <div class="cards-grid" id="cardsGrid"></div>
+
+  <div class="empty-state" id="emptyState">
+    <div class="icon">🌿</div>
+    <p>No events yet.<br>Add an event above to begin.</p>
+  </div>
+
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="editModal" onclick="closeModalOnOverlay(event)">
+  <div class="modal">
+    <h2>✎ Edit Member</h2>
+    <div class="form-grid">
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="edit-name" placeholder="Full name">
+      </div>
+      <div class="field">
+        <label>Relation</label>
+        <input type="text" id="edit-relation" placeholder="e.g. Father, Wife, Son…">
+      </div>
+      <div class="field">
+        <label>Date of Birth</label>
+        <input type="date" id="edit-dob">
+      </div>
+      <div class="field">
+        <label>Marriage Date <span style="opacity:0.5">(optional)</span></label>
+        <input type="date" id="edit-marriage">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let members = JSON.parse(localStorage.getItem('familyChronicle') || '[]');
+let currentFilter = 'all';
+
+function save() {
+  localStorage.setItem('familyChronicle', JSON.stringify(members));
+}
+
+function today() {
+  const d = new Date();
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+function daysUntilNextOccurrence(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  const t = today();
+  const next = new Date(t.getFullYear(), d.getMonth(), d.getDate());
+  if (next < t) next.setFullYear(t.getFullYear() + 1);
+  const diff = Math.round((next - t) / 86400000);
+  return diff;
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function getAge(dobStr) {
+  if (!dobStr) return '';
+  const d = new Date(dobStr);
+  const t = today();
+  let age = t.getFullYear() - d.getFullYear();
+  if (t.getMonth() < d.getMonth() || (t.getMonth() === d.getMonth() && t.getDate() < d.getDate())) age--;
+  return age;
+}
+
+function getYears(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  const t = today();
+  let y = t.getFullYear() - d.getFullYear();
+  if (t.getMonth() < d.getMonth() || (t.getMonth() === d.getMonth() && t.getDate() < d.getDate())) y--;
+  return y;
+}
+
+function countdownLabel(days) {
+  if (days === 0) return { text: '🎉 TODAY!', cls: 'today' };
+  if (days === 1) return { text: 'Tomorrow!', cls: 'soon' };
+  if (days <= 7) return { text: `in ${days} days`, cls: 'soon' };
+  if (days <= 30) return { text: `in ${days} days`, cls: 'normal' };
+  return { text: `in ${days} days`, cls: 'normal' };
+}
+
+function initials(name) {
+  return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+}
+
+function addMember() {
+  const name = document.getElementById('name').value.trim();
+  const relation = document.getElementById('relation').value;
+  const dob = document.getElementById('dob').value;
+  const marriage = document.getElementById('marriage').value;
+
+  if (!name || !dob) {
+    document.getElementById('name').style.borderColor = name ? '' : 'var(--terracotta)';
+    document.getElementById('dob').style.borderColor = dob ? '' : 'var(--terracotta)';
+    return;
+  }
+
+  members.push({ id: Date.now(), name, relation, dob, marriage });
+  save();
+  document.getElementById('name').value = '';
+  document.getElementById('relation').value = '';
+  document.getElementById('dob').value = '';
+  document.getElementById('marriage').value = '';
+  document.getElementById('name').style.borderColor = '';
+  document.getElementById('dob').style.borderColor = '';
+  render();
+}
+
+function deleteMember(id) {
+  members = members.filter(m => m.id !== id);
+  save();
+  render();
+}
+
+let editingId = null;
+
+function openEdit(id) {
+  const m = members.find(m => m.id === id);
+  if (!m) return;
+  editingId = id;
+  document.getElementById('edit-name').value = m.name;
+  document.getElementById('edit-relation').value = m.relation;
+  document.getElementById('edit-dob').value = m.dob;
+  document.getElementById('edit-marriage').value = m.marriage || '';
+  document.getElementById('editModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('editModal').classList.remove('open');
+  editingId = null;
+}
+
+function closeModalOnOverlay(e) {
+  if (e.target === document.getElementById('editModal')) closeModal();
+}
+
+function saveEdit() {
+  const name = document.getElementById('edit-name').value.trim();
+  const relation = document.getElementById('edit-relation').value;
+  const dob = document.getElementById('edit-dob').value;
+  const marriage = document.getElementById('edit-marriage').value;
+
+  if (!name || !dob) {
+    document.getElementById('edit-name').style.borderColor = name ? '' : 'var(--terracotta)';
+    document.getElementById('edit-dob').style.borderColor = dob ? '' : 'var(--terracotta)';
+    return;
+  }
+
+  const idx = members.findIndex(m => m.id === editingId);
+  if (idx !== -1) {
+    members[idx] = { ...members[idx], name, relation, dob, marriage };
+    save();
+    render();
+  }
+  closeModal();
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  render();
+}
+
+function buildFilterButtons() {
+  const container = document.getElementById('filterBtns');
+  const relations = [...new Set(members.map(m => m.relation).filter(Boolean))].sort();
+  container.innerHTML = `<button class="filter-btn${currentFilter === 'all' ? ' active' : ''}" onclick="setFilter('all', this)">All</button>`;
+  relations.forEach(r => {
+    container.innerHTML += `<button class="filter-btn${currentFilter === r ? ' active' : ''}" onclick="setFilter('${r.replace(/'/g,"\\'")}', this)">${r}</button>`;
+  });
+}
+
+// Safe CSS class name from free-text relation
+function relationClass(rel) {
+  if (!rel) return 'other';
+  return rel.toLowerCase().replace(/[^a-z0-9]/g, '-').slice(0, 20);
+}
+
+function render() {
+  buildFilterButtons();
+  const filtered = currentFilter === 'all' ? members : members.filter(m => m.relation === currentFilter);
+  const grid = document.getElementById('cardsGrid');
+  const empty = document.getElementById('emptyState');
+
+  grid.innerHTML = '';
+  empty.style.display = filtered.length ? 'none' : 'block';
+
+  // Build a map: marriage date → [member names who share it] (across ALL members, not just filtered)
+  const marriageGroups = {};
+  members.forEach(m => {
+    if (m.marriage) {
+      if (!marriageGroups[m.marriage]) marriageGroups[m.marriage] = [];
+      marriageGroups[m.marriage].push(m.name);
+    }
+  });
+
+  filtered.forEach((m, i) => {
+    const dobDays = daysUntilNextOccurrence(m.dob);
+    const marDays = daysUntilNextOccurrence(m.marriage);
+    const age = getAge(m.dob);
+    const years = getYears(m.marriage);
+
+    const dobCD = countdownLabel(dobDays);
+    const marCD = m.marriage ? countdownLabel(marDays) : null;
+
+    // Check if this member shares their marriage date with someone else
+    const sharedWith = m.marriage
+      ? marriageGroups[m.marriage].filter(n => n !== m.name)
+      : [];
+    const isShared = sharedWith.length > 0;
+
+    // Only the first person in the group renders the anniversary row; others show a "shared" badge
+    const isFirstInGroup = m.marriage
+      ? marriageGroups[m.marriage][0] === m.name
+      : false;
+
+    const card = document.createElement('div');
+    card.className = `member-card relation-${relationClass(m.relation)}`;
+    card.style.animationDelay = `${i * 0.06}s`;
+
+    let anniversaryHTML = '';
+    if (m.marriage) {
+      if (!isShared) {
+        // Solo anniversary row
+        anniversaryHTML = `
+        <div class="date-row">
+          <div class="date-label"><span>💍</span> Anniversary</div>
+          <div class="date-info">
+            <div class="date-value">${formatDate(m.marriage)}</div>
+            <div class="countdown ${marCD.cls}">${marCD.text}</div>
+            <div class="age-tag">${years} year${years !== 1 ? 's' : ''} together</div>
+          </div>
+        </div>`;
+      } else if (isFirstInGroup) {
+        // Shared anniversary — full row with partner names shown
+        const partnerList = sharedWith.join(' & ');
+        anniversaryHTML = `
+        <div class="date-row shared-anniversary">
+          <div class="date-label"><span>💍</span> Anniversary <span class="shared-tag">with ${partnerList}</span></div>
+          <div class="date-info">
+            <div class="date-value">${formatDate(m.marriage)}</div>
+            <div class="countdown ${marCD.cls}">${marCD.text}</div>
+            <div class="age-tag">${years} year${years !== 1 ? 's' : ''} together</div>
+          </div>
+        </div>`;
+      } else {
+        // Secondary person in shared group — show a compact reference
+        const primaryName = marriageGroups[m.marriage][0];
+        anniversaryHTML = `
+        <div class="date-row shared-ref">
+          <div class="date-label"><span>💍</span> Anniversary</div>
+          <div class="date-info">
+            <div class="shared-ref-text">Shared with ${primaryName}</div>
+            <div class="age-tag">${formatDate(m.marriage)} · ${years} yr${years !== 1 ? 's' : ''}</div>
+          </div>
+        </div>`;
+      }
+    }
+
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="avatar">${initials(m.name)}</div>
+        <div class="card-name">
+          <h3>${m.name}</h3>
+          <span class="relation-badge">${m.relation}</span>
+        </div>
+        <div class="card-actions">
+          <button class="card-edit" onclick="openEdit(${m.id})" title="Edit">✎</button>
+          <button class="card-delete" onclick="deleteMember(${m.id})" title="Remove">✕</button>
+        </div>
+      </div>
+
+      <div class="date-row">
+        <div class="date-label"><span>🎂</span> Birthday</div>
+        <div class="date-info">
+          <div class="date-value">${formatDate(m.dob)}</div>
+          <div class="countdown ${dobCD.cls}">${dobCD.text}</div>
+          <div class="age-tag">Age: ${age} yrs${dobDays === 0 ? ` → turns ${age+1}` : ``}</div>
+        </div>
+      </div>
+
+      ${anniversaryHTML}
+    `;
+
+    grid.appendChild(card);
+  });
+
+  // Stats — count unique marriage dates only
+  const uniqueMarriageDates = new Set(members.filter(m => m.marriage).map(m => m.marriage));
+  const statsBar = document.getElementById('statsBar');
+  if (members.length > 0) {
+    statsBar.style.display = 'flex';
+    document.getElementById('statTotal').textContent = members.length;
+    document.getElementById('statBirthdays').textContent = members.length;
+    document.getElementById('statMarriages').textContent = uniqueMarriageDates.size;
+  } else {
+    statsBar.style.display = 'none';
+  }
+
+  // Upcoming (30 days) — deduplicate shared marriage dates
+  const upcoming = [];
+  const seenMarriageDates = new Set();
+
+  members.forEach(m => {
+    const dobD = daysUntilNextOccurrence(m.dob);
+    if (dobD !== null && dobD <= 30) {
+      upcoming.push({ label: `${m.name}`, type: 'Birthday 🎂', days: dobD });
+    }
+    if (m.marriage && !seenMarriageDates.has(m.marriage)) {
+      seenMarriageDates.add(m.marriage);
+      const marD = daysUntilNextOccurrence(m.marriage);
+      if (marD !== null && marD <= 30) {
+        // Group all names sharing this date
+        const names = marriageGroups[m.marriage].join(' & ');
+        upcoming.push({ label: names, type: 'Anniversary 💍', days: marD });
+      }
+    }
+  });
+  upcoming.sort((a, b) => a.days - b.days);
+
+  const upcomingSection = document.getElementById('upcomingSection');
+  const upcomingList = document.getElementById('upcomingList');
+  if (upcoming.length > 0) {
+    upcomingSection.style.display = 'block';
+    upcomingList.innerHTML = upcoming.map(u => `
+      <div class="upcoming-item">
+        <strong>${u.label}</strong> — ${u.type}
+        <span class="days-badge">${u.days === 0 ? 'Today' : u.days === 1 ? 'Tomorrow' : `${u.days}d`}</span>
+      </div>
+    `).join('');
+  } else {
+    upcomingSection.style.display = 'none';
+  }
+}
+
+// Live date display
+function updateLiveDate() {
+  const now = new Date();
+  const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  document.getElementById('liveDate').textContent = now.toLocaleDateString('en-IN', opts);
+}
+
+// Enter key on name field
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Enter' && !document.getElementById('editModal').classList.contains('open')) addMember();
+});
+
+updateLiveDate();
+setInterval(updateLiveDate, 60000);
+render();
+</script>
+</body>
+</html>
